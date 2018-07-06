@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">vmemo</string>
+    <string name="permission_rationale">permission is needed for the app to function</string>
+    <string name="button_allow">Allow</string>
+    <string name="button_deny">Deny</string>
+    <string name="permission_denied">permission was denied. Please consider granting it for the app to Function</string>
+    <string name="permission_neverask">permission was denied with never ask again</string>
 </resources>

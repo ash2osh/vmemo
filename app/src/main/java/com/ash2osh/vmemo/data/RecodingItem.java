@@ -3,6 +3,7 @@ package com.ash2osh.vmemo.data;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.Date;
 
@@ -16,8 +17,7 @@ import java.util.Date;
 @Entity(tableName = "recordings")
 public class RecodingItem {
 
-    @PrimaryKey
-    @NonNull
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     private String filename;
@@ -26,8 +26,7 @@ public class RecodingItem {
     private Date filedate;
 
 
-    public RecodingItem(@NonNull int id, String filename, String fileurl, Date filedate) {
-        this.id = id;
+    public RecodingItem( String filename, String fileurl, Date filedate) {
         this.filename = filename;
         this.fileurl = fileurl;
         this.filedate = filedate;

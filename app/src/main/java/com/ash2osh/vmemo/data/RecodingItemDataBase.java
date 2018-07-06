@@ -6,7 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
-@Database(entities = {RecodingItem.class}, version = 2)
+@Database(entities = {RecodingItem.class}, version = 3)
 @TypeConverters({Converters.class})
 public abstract class RecodingItemDataBase  extends RoomDatabase {
     public abstract RecodingItemDao recodingItemDao();
@@ -21,6 +21,7 @@ public abstract class RecodingItemDataBase  extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             RecodingItemDataBase.class, "RecodingItemDataBase")
+                            .addMigrations(migrations.MIGRATION_2_3)
                             .build();
 
                 }
