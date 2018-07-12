@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity->";
     @BindView(R.id.recordingsRV)
     RecyclerView rv;
+    @BindView(R.id.recordFAB)
+    FloatingActionButton button;
 
     private RecordingViewModel recordingViewModel;
     private List<RecodingItem> recodingItemList;
@@ -80,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
     private void setupRecycler() {
         adapter = new RecordingItemsAdapter(recodingItemList);
         adapter.openLoadAnimation(BaseQuickAdapter.SLIDEIN_BOTTOM);
+        SetUpBottomSheetClickers();
+
+        rv.setHasFixedSize(true);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        rv.setAdapter(adapter);
+    }
+
+    private void SetUpBottomSheetClickers() {
         adapter.setOnItemClickListener((adapter1, view, position) -> {
             RecodingItem item = (RecodingItem) adapter1.getItem(position);
 
@@ -88,42 +98,54 @@ public class MainActivity extends AppCompatActivity {
 
             //set click listeners
             LinearLayout play = sheetView.findViewById(R.id.bottom_sheet_play);
+            LinearLayout edit = sheetView.findViewById(R.id.bottom_sheet_edit);
             LinearLayout delete = sheetView.findViewById(R.id.bottom_sheet_delete);
+            LinearLayout remind = sheetView.findViewById(R.id.bottom_sheet_reminder);
+            LinearLayout share = sheetView.findViewById(R.id.bottom_sheet_share);
             play.setOnClickListener(v -> {
                 mBottomSheetDialog.dismiss();
-                PlayRecording(item);
+                MainActivityPermissionsDispatcher.PlayRecordingWithPermissionCheck(this, item);
+            });
+            edit.setOnClickListener(v -> {
+                mBottomSheetDialog.dismiss();
+                EditRecording(item);
             });
             delete.setOnClickListener(v -> {
                 mBottomSheetDialog.dismiss();
                 DeleteRecording(item);
+            });
+            remind.setOnClickListener(v -> {
+                mBottomSheetDialog.dismiss();
+                RemindRecording(item);
+            });
+            share.setOnClickListener(v -> {
+                mBottomSheetDialog.dismiss();
+                ShareRecording(item);
             });
 
             mBottomSheetDialog.setContentView(sheetView);
             mBottomSheetDialog.show();
 
         });
-
-        rv.setHasFixedSize(true);
-        rv.setLayoutManager(new LinearLayoutManager(this));
-        rv.setAdapter(adapter);
     }
 
 
     @OnClick(R.id.recordFAB)
     void recordFABClick(View v) {
-        FloatingActionButton button = (FloatingActionButton) v;
+
         if (mIsRecording) {
-            button.setImageResource(R.drawable.exo_icon_stop);
+
             StopRecording();
         } else {
             MainActivityPermissionsDispatcher.StartRecordingWithPermissionCheck(this);
-            button.setImageResource(R.drawable.ic_mic_black_24dp);
+
         }
 
     }
 
     @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO})
     public void StartRecording() {
+        button.setImageResource(R.drawable.exo_icon_stop);
         String filename = String.valueOf(System.currentTimeMillis() / 1000);
         recordAudio(filename + ".3gp");
     }
@@ -181,16 +203,27 @@ public class MainActivity extends AppCompatActivity {
         recordingViewModel.insertItem(new RecodingItem(mCurrentFile.getName(), mCurrentFile.getAbsolutePath(), new Date()));
         mRecorder = null;
         mCurrentFile = null;
+        button.setImageResource(R.drawable.ic_mic_black_24dp);
     }
 
     @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO})
     public void PlayRecording(RecodingItem item) {
-        //TODO show exo player fragment on play
+        //TODO show exo player Dialog
 
     }
 
+    private void EditRecording(RecodingItem item) {
+
+    }
     private void DeleteRecording(RecodingItem item) {
 
+    }
+
+
+    private void ShareRecording(RecodingItem item) {
+    }
+
+    private void RemindRecording(RecodingItem item) {
     }
 
     @Override
