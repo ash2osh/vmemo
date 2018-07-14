@@ -1,23 +1,28 @@
 package com.ash2osh.vmemo.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.ash2osh.vmemo.R;
 import com.ash2osh.vmemo.data.RecodingItem;
 import com.ash2osh.vmemo.rv.RecordingItemsAdapter;
@@ -25,6 +30,7 @@ import com.ash2osh.vmemo.viewmodel.RecordingViewModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -131,10 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     @OnClick(R.id.recordFAB)
-    void recordFABClick(View v) {
-
+    void recordFABClick() {
         if (mIsRecording) {
-
             StopRecording();
         } else {
             MainActivityPermissionsDispatcher.StartRecordingWithPermissionCheck(this);
@@ -147,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     public void StartRecording() {
         button.setImageResource(R.drawable.exo_icon_stop);
         String filename = String.valueOf(System.currentTimeMillis() / 1000);
-        recordAudio(filename + ".3gp");
+        recordAudio(filename + ".amr");
     }
 
     public void recordAudio(String fileName) {
@@ -190,7 +194,17 @@ public class MainActivity extends AppCompatActivity {
                 + "/" + filename);
 
         if (!file.getParentFile().mkdirs()) { //create parent directory
-            Log.e(TAG, "Directory not created");
+            Log.i(TAG, "Directory not created !!?");
+        } else {
+            Log.i(TAG, "Directory created :)");
+            //create .nomedia file
+            File nm = new File(Environment.getExternalStoragePublicDirectory("vmemo").getAbsolutePath()
+                    + "/.nomedia");
+            try {
+                nm.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return file;
     }
@@ -213,14 +227,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void EditRecording(RecodingItem item) {
+//Show Edit Dialog
+        new MaterialDialog.Builder(this)
+                .title("Edit Recording Title")
+                .content("Please Enter New Title")
+                .inputType(InputType.TYPE_CLASS_TEXT )
+                .input("New Title ", item.getFilename(), new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
+                        item.setFilename(input.toString());
+                        recordingViewModel.insertItem(item);
 
+                        dialog.dismiss();
+
+                    }
+                }).show();
     }
-    private void DeleteRecording(RecodingItem item) {
 
+    private void DeleteRecording(RecodingItem item) {
+        File f = new File(item.getFileurl());
+        recordingViewModel.deleteItem(item);
+        f.delete();
     }
 
 
     private void ShareRecording(RecodingItem item) {
+
+        ShareCompat.IntentBuilder.from(this)
+                .setType("audio/AMR")
+                .setChooserTitle("Share Recording")
+                .setText(item.getFilename())
+                .setStream(Uri.fromFile(new File(item.getFileurl())))
+                .startChooser();
+
     }
 
     private void RemindRecording(RecodingItem item) {

@@ -38,12 +38,12 @@ private RecodingItemRepository repository;
         deleteItemTask.execute(item);
     }
 
-    private class DeleteItemTask extends AsyncTask<RecodingItem, Void, Void> {
+    private class DeleteItemTask extends AsyncTask<RecodingItem, Void, Integer> {
 
         @Override
-        protected Void doInBackground(RecodingItem... item) {
-            repository.deleteRecordingItem(item[0]);
-            return null;
+        protected Integer doInBackground(RecodingItem... item) {
+           return repository.deleteRecordingItem(item[0]);
+
         }
     }
 

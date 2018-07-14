@@ -29,7 +29,7 @@ public class RecodingItemRepository {
         return recodingItemDao.insertRecodingItem(item);
     }
 
-    public void deleteRecordingItem(RecodingItem item){
-        recodingItemDao.deleteRecodingItem(item);
+    public int deleteRecordingItem(RecodingItem item){
+       return recodingItemDao.deleteRecodingItem(item);
     }
 }
