@@ -1,9 +1,9 @@
 package com.ash2osh.vmemo.ui;
 
 import android.Manifest;
-import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,12 +28,24 @@ import com.ash2osh.vmemo.data.RecodingItem;
 import com.ash2osh.vmemo.rv.RecordingItemsAdapter;
 import com.ash2osh.vmemo.viewmodel.RecordingViewModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rv;
     @BindView(R.id.recordFAB)
     FloatingActionButton button;
-
+    private MaterialDialog mPlayerDialog;
     private RecordingViewModel recordingViewModel;
     private List<RecodingItem> recodingItemList;
     private RecordingItemsAdapter adapter;
@@ -97,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void SetUpBottomSheetClickers() {
         adapter.setOnItemClickListener((adapter1, view, position) -> {
+            if (mIsRecording){//TODO test
+                Toast.makeText(this, "Recording in Progress", Toast.LENGTH_SHORT).show();
+                return;
+            }
             RecodingItem item = (RecodingItem) adapter1.getItem(position);
 
             BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(this);
@@ -222,8 +238,48 @@ public class MainActivity extends AppCompatActivity {
 
     @NeedsPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO})
     public void PlayRecording(RecodingItem item) {
-        //TODO show exo player Dialog
+        File itemFile = new File(item.getFileurl());
+        //exo player Dialog
 
+        mPlayerDialog = new MaterialDialog.Builder(this)
+                .title(item.getFilename())
+                .customView(R.layout.exo_player_dialog, false)
+                .positiveText(R.string.close)
+                .backgroundColor(Color.BLACK)
+                .positiveColor(Color.WHITE)
+                .build();
+
+
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        DefaultTrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+// 2. Create the player
+        SimpleExoPlayer player =
+                ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        //set view
+        View view = mPlayerDialog.getView();
+        PlayerView playerView = view.findViewById(R.id.dialog_player_view);
+        playerView.setPlayer(player);
+        //always show controls
+        playerView.setControllerShowTimeoutMs(999999999);
+        playerView.setControllerHideOnTouch(false);
+
+// Produces DataSource instances through which media data is loaded.
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
+                Util.getUserAgent(this, "vmemo"));
+// This is the MediaSource representing the media to be played.
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(Uri.fromFile(itemFile));
+// Prepare the player with the source.
+        player.prepare(videoSource);
+        player.setVolume(1);
+        player.setPlayWhenReady(true);//auto play
+        //release player when dismiss dialog
+        mPlayerDialog.setOnDismissListener(dialog1 -> player.release());
+
+        mPlayerDialog.show();
     }
 
     private void EditRecording(RecodingItem item) {
@@ -231,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         new MaterialDialog.Builder(this)
                 .title("Edit Recording Title")
                 .content("Please Enter New Title")
-                .inputType(InputType.TYPE_CLASS_TEXT )
+                .inputType(InputType.TYPE_CLASS_TEXT)
                 .input("New Title ", item.getFilename(), new MaterialDialog.InputCallback() {
                     @Override
                     public void onInput(MaterialDialog dialog, CharSequence input) {
@@ -268,6 +324,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        mPlayerDialog.dismiss();
         if (mIsRecording) {
             StopRecording();
         }
