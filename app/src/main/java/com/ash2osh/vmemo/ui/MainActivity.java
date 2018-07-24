@@ -1,6 +1,8 @@
 package com.ash2osh.vmemo.ui;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.graphics.Color;
@@ -19,12 +21,15 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.ash2osh.vmemo.R;
 import com.ash2osh.vmemo.data.RecodingItem;
+import com.ash2osh.vmemo.jobs.ReminderJob;
 import com.ash2osh.vmemo.rv.RecordingItemsAdapter;
 import com.ash2osh.vmemo.viewmodel.RecordingViewModel;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -44,6 +49,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -109,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void SetUpBottomSheetClickers() {
         adapter.setOnItemClickListener((adapter1, view, position) -> {
-            if (mIsRecording){//TODO test
+            if (mIsRecording) {//TODO test
                 Toast.makeText(this, "Recording in Progress", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -319,12 +325,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void RemindRecording(RecodingItem item) {
+        showDateTimePicker(item);
+    }
+
+
+    public void showDateTimePicker(RecodingItem item) {
+        Calendar mRemindDate;
+        final Calendar currentDate = Calendar.getInstance();
+        mRemindDate = Calendar.getInstance();
+        new DatePickerDialog(this, (view, year, monthOfYear, dayOfMonth) -> {
+            mRemindDate.set(year, monthOfYear, dayOfMonth);
+            new TimePickerDialog(MainActivity.this, (view1, hourOfDay, minute) -> {
+                mRemindDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                mRemindDate.set(Calendar.MINUTE, minute);
+                Log.v(TAG, "The choosen one " + mRemindDate.getTime());
+                CreateReminderJob(item,mRemindDate);
+            }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
+    }
+
+    private void CreateReminderJob(RecodingItem item, Calendar mRemindDate) {
+        ReminderJob.scheduleJob(mRemindDate.getTimeInMillis() - System.currentTimeMillis()); //offset from now
+        //TODO show Toast with confirmation
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mPlayerDialog.dismiss();
+        if (mPlayerDialog != null){
+            mPlayerDialog.dismiss();
+        }
         if (mIsRecording) {
             StopRecording();
         }
