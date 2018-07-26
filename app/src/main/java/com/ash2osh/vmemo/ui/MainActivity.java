@@ -333,6 +333,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar mRemindDate;
         final Calendar currentDate = Calendar.getInstance();
         mRemindDate = Calendar.getInstance();
+        //TODO this fires two times on kitkat ??
         new DatePickerDialog(this, (view, year, monthOfYear, dayOfMonth) -> {
             mRemindDate.set(year, monthOfYear, dayOfMonth);
             new TimePickerDialog(MainActivity.this, (view1, hourOfDay, minute) -> {
