@@ -3,8 +3,10 @@ package com.ash2osh.vmemo.ui;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -100,6 +102,18 @@ public class MainActivity extends AppCompatActivity {
 
         setupRecycler();
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {//https://stackoverflow.com/questions/18037991/
+        super.onNewIntent(intent);
+        if (intent.hasExtra("id")) {
+            int id = intent.getIntExtra("id", 0);
+            LiveData<RecodingItem> recodingItemById = recordingViewModel.getRecodingItemById(id);
+            Observer<RecodingItem> itemObserver = recodingItem ->
+                    MainActivityPermissionsDispatcher.PlayRecordingWithPermissionCheck(this, recodingItem);
+            recodingItemById.observe(this, itemObserver);
+        }
 
     }
 
@@ -340,20 +354,25 @@ public class MainActivity extends AppCompatActivity {
                 mRemindDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mRemindDate.set(Calendar.MINUTE, minute);
                 Log.v(TAG, "The choosen one " + mRemindDate.getTime());
-                CreateReminderJob(item,mRemindDate);
+                CreateReminderJob(item, mRemindDate);
             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
         }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
     }
 
     private void CreateReminderJob(RecodingItem item, Calendar mRemindDate) {
-        ReminderJob.scheduleJob(mRemindDate.getTimeInMillis() - System.currentTimeMillis()); //offset from now
-        //TODO show Toast with confirmation
+        long t = mRemindDate.getTimeInMillis() - System.currentTimeMillis();
+        if (t > 0) {
+            ReminderJob.scheduleJob(t, item.getId()); //offset from now
+            Toast.makeText(this, "Reminder Set", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Error: Date Must be in the Future", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mPlayerDialog != null){
+        if (mPlayerDialog != null) {
             mPlayerDialog.dismiss();
         }
         if (mIsRecording) {
@@ -382,7 +401,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }

@@ -15,7 +15,7 @@ public abstract class RecodingItemDataBase  extends RoomDatabase {
     private static RecodingItemDataBase INSTANCE;
 
 
-    static RecodingItemDataBase getDatabase(final Context context) {
+   public static RecodingItemDataBase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (RecodingItemDataBase.class) {
                 if (INSTANCE == null) {

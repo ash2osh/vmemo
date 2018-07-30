@@ -30,6 +30,9 @@ public interface RecodingItemDao {
     @Query("SELECT * FROM recordings WHERE id = :id")
     LiveData<RecodingItem> getRecordingItemById(int id);
 
+    @Query("SELECT * FROM recordings WHERE id = :id")
+    RecodingItem getRecordingItemByIdNormal(int id);
+
     /**
      * Get all entities of type ListItem
      * @return
