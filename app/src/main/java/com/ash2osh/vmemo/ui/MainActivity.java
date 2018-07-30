@@ -100,11 +100,19 @@ public class MainActivity extends AppCompatActivity {
 
         setupRecycler();
 
+
+        CheckExtraId(getIntent());
+
     }
 
     @Override
     protected void onNewIntent(Intent intent) {//https://stackoverflow.com/questions/18037991/
         super.onNewIntent(intent);
+        CheckExtraId(intent);
+
+    }
+
+    private void CheckExtraId(Intent intent) {
         if (intent.hasExtra("id")) {
             int id = intent.getIntExtra("id", 0);
             LiveData<RecodingItem> recodingItemById = recordingViewModel.getRecodingItemById(id);
@@ -112,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
                     MainActivityPermissionsDispatcher.PlayRecordingWithPermissionCheck(this, recodingItem);
             recodingItemById.observe(this, itemObserver);
         }
-
     }
 
     private void setupRecycler() {
