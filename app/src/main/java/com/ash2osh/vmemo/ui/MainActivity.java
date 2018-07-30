@@ -23,9 +23,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.LinearLayout;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -135,40 +133,45 @@ public class MainActivity extends AppCompatActivity {
             }
             RecodingItem item = (RecodingItem) adapter1.getItem(position);
 
+
             BottomSheetDialog mBottomSheetDialog = new BottomSheetDialog(this);
             View sheetView = this.getLayoutInflater().inflate(R.layout.bottom_sheet, null);
 
-            //set click listeners
-            LinearLayout play = sheetView.findViewById(R.id.bottom_sheet_play);
-            LinearLayout edit = sheetView.findViewById(R.id.bottom_sheet_edit);
-            LinearLayout delete = sheetView.findViewById(R.id.bottom_sheet_delete);
-            LinearLayout remind = sheetView.findViewById(R.id.bottom_sheet_reminder);
-            LinearLayout share = sheetView.findViewById(R.id.bottom_sheet_share);
-            play.setOnClickListener(v -> {
-                mBottomSheetDialog.dismiss();
-                MainActivityPermissionsDispatcher.PlayRecordingWithPermissionCheck(this, item);
-            });
-            edit.setOnClickListener(v -> {
-                mBottomSheetDialog.dismiss();
-                EditRecording(item);
-            });
-            delete.setOnClickListener(v -> {
-                mBottomSheetDialog.dismiss();
-                DeleteRecording(item);
-            });
-            remind.setOnClickListener(v -> {
-                mBottomSheetDialog.dismiss();
-                RemindRecording(item);
-            });
-            share.setOnClickListener(v -> {
-                mBottomSheetDialog.dismiss();
-                ShareRecording(item);
-            });
+            if (item != null) {
 
-            mBottomSheetDialog.setContentView(sheetView);
-            mBottomSheetDialog.show();
+                //set click listeners
+                LinearLayout play = sheetView.findViewById(R.id.bottom_sheet_play);
+                LinearLayout edit = sheetView.findViewById(R.id.bottom_sheet_edit);
+                LinearLayout delete = sheetView.findViewById(R.id.bottom_sheet_delete);
+                LinearLayout remind = sheetView.findViewById(R.id.bottom_sheet_reminder);
+                LinearLayout share = sheetView.findViewById(R.id.bottom_sheet_share);
+                play.setOnClickListener(v -> {
+                    mBottomSheetDialog.dismiss();
+                    MainActivityPermissionsDispatcher.PlayRecordingWithPermissionCheck(this, item);
+                });
+                edit.setOnClickListener(v -> {
+                    mBottomSheetDialog.dismiss();
+                    EditRecording(item);
+                });
+                delete.setOnClickListener(v -> {
+                    mBottomSheetDialog.dismiss();
+                    DeleteRecording(item);
+                });
+                remind.setOnClickListener(v -> {
+                    mBottomSheetDialog.dismiss();
+                    RemindRecording(item);
+                });
+                share.setOnClickListener(v -> {
+                    mBottomSheetDialog.dismiss();
+                    ShareRecording(item);
+                });
+
+                mBottomSheetDialog.setContentView(sheetView);
+                mBottomSheetDialog.show();
+            }//end if (item != null) {
 
         });
+
     }
 
 
@@ -218,10 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     public File getPublicAlbumStorageDir(String filename) {
@@ -308,15 +308,12 @@ public class MainActivity extends AppCompatActivity {
                 .title("Edit Recording Title")
                 .content("Please Enter New Title")
                 .inputType(InputType.TYPE_CLASS_TEXT)
-                .input("New Title ", item.getFilename(), new MaterialDialog.InputCallback() {
-                    @Override
-                    public void onInput(MaterialDialog dialog, CharSequence input) {
-                        item.setFilename(input.toString());
-                        recordingViewModel.insertItem(item);
+                .input("New Title ", item.getFilename(), (dialog, input) -> {
+                    item.setFilename(input.toString());
+                    recordingViewModel.insertItem(item);
 
-                        dialog.dismiss();
+                    dialog.dismiss();
 
-                    }
                 }).show();
     }
 
@@ -353,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
             new TimePickerDialog(MainActivity.this, (view1, hourOfDay, minute) -> {
                 mRemindDate.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 mRemindDate.set(Calendar.MINUTE, minute);
-                Log.v(TAG, "The choosen one " + mRemindDate.getTime());
+                Log.v(TAG, "The chosen one " + mRemindDate.getTime());
                 CreateReminderJob(item, mRemindDate);
             }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
         }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
@@ -396,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnNeverAskAgain({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO})
     void showNeverAskForBoth() {
-        Toast.makeText(this, R.string.permission_neverask, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.permission_never_ask, Toast.LENGTH_SHORT).show();
     }
 
 

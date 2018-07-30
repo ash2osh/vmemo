@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
     android:layoutDirection="ltr"
-    android:background="#CC000000"
     android:orientation="vertical">
 
     <LinearLayout

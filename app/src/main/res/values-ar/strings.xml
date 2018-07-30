@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">المفكرة الصوتية</string>
+    <string name="permission_rationale"> الإذن مطلوب للتطبيق للعمل</string>
+    <string name="button_allow">سماح</string>
+    <string name="button_deny">رفض</string>
+    <string name="permission_denied">تم رفض الإذن. يرجى النظر في منحه للتطبيق لكى يعمل </string>
+    <string name="permission_never_ask">تم رفض الإذن دون السؤال مرة أخرى</string>
+    <string name="close">اغلاق</string>
+    <string name="play">تشغيل</string>
+    <string name="edit">تعديل</string>
+    <string name="delete">مسح</string>
+    <string name="create_reminder">عمل تذكير </string>
+    <string name="share">مشاركة</string>
+</resources>

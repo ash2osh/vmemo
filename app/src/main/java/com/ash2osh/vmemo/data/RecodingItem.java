@@ -2,8 +2,6 @@ package com.ash2osh.vmemo.data;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.util.Date;
 
@@ -11,7 +9,7 @@ import java.util.Date;
 /**
  * Room will use the Class name a sa default table name.
  *
- * This can be chagned by setting @Entity(tableName = "tableName")
+ * This can be changed by setting @Entity(tableName = "tableName")
  */
 
 @Entity(tableName = "recordings")
@@ -32,12 +30,11 @@ public class RecodingItem {
         this.filedate = filedate;
     }
 
-    @NonNull
     public int getId() {
         return id;
     }
 
-    public void setId(@NonNull int id) {
+    public void setId(int id) {
         this.id = id;
     }
 

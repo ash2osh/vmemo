@@ -17,7 +17,7 @@ public class RecodingItemRepository {
 
 
 
-    public LiveData<List<RecodingItem>> getRecodingsList(){
+    public LiveData<List<RecodingItem>> getRecordingsList(){
         return recodingItemDao.getRecordingItems();
     }
 

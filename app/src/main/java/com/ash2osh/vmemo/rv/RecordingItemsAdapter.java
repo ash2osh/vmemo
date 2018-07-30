@@ -1,7 +1,6 @@
 package com.ash2osh.vmemo.rv;
 
 import android.support.annotation.Nullable;
-import android.widget.ImageButton;
 
 import com.ash2osh.vmemo.R;
 import com.ash2osh.vmemo.data.RecodingItem;

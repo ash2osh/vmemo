@@ -21,7 +21,7 @@ private RecodingItemRepository repository;
 
 
     public LiveData<List<RecodingItem>> getListItems() {
-        return repository.getRecodingsList();
+        return repository.getRecordingsList();
     }
 
     public LiveData<RecodingItem> getRecodingItemById(int id){
@@ -38,7 +38,7 @@ private RecodingItemRepository repository;
         deleteItemTask.execute(item);
     }
 
-    private class DeleteItemTask extends AsyncTask<RecodingItem, Void, Integer> {
+    private class  DeleteItemTask extends AsyncTask<RecodingItem, Void, Integer> {
 
         @Override
         protected Integer doInBackground(RecodingItem... item) {

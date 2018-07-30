@@ -48,7 +48,7 @@
                 app:layout_constraintStart_toEndOf="@+id/playItemIV"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_chainStyle="packed"
-                tools:text="Recodring of yesterday scandal" />
+                tools:text="Recording of yesterday scandal" />
 
             <ImageView
                 android:id="@+id/playItemIV"

@@ -1,39 +1,33 @@
 package com.ash2osh.vmemo.jobs;
 
-import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ash2osh.vmemo.R;
 import com.ash2osh.vmemo.data.RecodingItem;
 import com.ash2osh.vmemo.data.RecodingItemDao;
 import com.ash2osh.vmemo.data.RecodingItemDataBase;
 import com.ash2osh.vmemo.ui.MainActivity;
-import com.ash2osh.vmemo.viewmodel.RecordingViewModel;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
 public class ReminderJob extends Job {
     public static final String TAG = "job_reminder_tag";
-    private final Handler mHandler;
-    private NotificationManager notifManager;
+   // private final Handler mHandler;
+    private NotificationManager notificationManager;
 
     public ReminderJob() {
-        mHandler = new Handler(Looper.getMainLooper());
+
+        //mHandler = new Handler(Looper.getMainLooper());
     }
 
     @NonNull
@@ -79,8 +73,8 @@ public class ReminderJob extends Job {
         PendingIntent pendingIntent;
         NotificationCompat.Builder builder;
 
-        if (notifManager == null) {
-            notifManager =
+        if (notificationManager == null) {
+            notificationManager =
                     (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
         }
 
@@ -95,13 +89,13 @@ public class ReminderJob extends Job {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel mChannel = notifManager.getNotificationChannel(id);
+            NotificationChannel mChannel = notificationManager.getNotificationChannel(id);
             if (mChannel == null) {
                 mChannel = new NotificationChannel(id, name, importance);
                 mChannel.setDescription(description);
                 mChannel.enableVibration(true);
                 mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
-                notifManager.createNotificationChannel(mChannel);
+                notificationManager.createNotificationChannel(mChannel);
             }
             builder = new NotificationCompat.Builder(getContext(), id);
 
@@ -129,6 +123,6 @@ public class ReminderJob extends Job {
         } // else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
         Notification notification = builder.build();
-        notifManager.notify(NOTIFY_ID, notification);
+        notificationManager.notify(NOTIFY_ID, notification);
     }
 }
