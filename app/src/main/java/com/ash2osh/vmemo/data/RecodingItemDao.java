@@ -36,7 +36,7 @@ public interface RecodingItemDao {
      * Get all entities of type ListItem
      * @return
      */
-    @Query("SELECT * FROM recordings")
+    @Query("SELECT * FROM recordings order by filedate desc")
     LiveData<List<RecodingItem>> getRecordingItems();
 
 

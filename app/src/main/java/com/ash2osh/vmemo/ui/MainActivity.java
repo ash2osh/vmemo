@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void SetUpBottomSheetClickers() {
         adapter.setOnItemClickListener((adapter1, view, position) -> {
-            if (mIsRecording) {//TODO test
+            if (mIsRecording) {
                 Toast.makeText(this, "Recording in Progress", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -257,7 +257,8 @@ public class MainActivity extends AppCompatActivity {
         mIsRecording = false;
         mRecorder.stop();
         mRecorder.release();
-        recordingViewModel.insertItem(new RecodingItem(mCurrentFile.getName(), mCurrentFile.getAbsolutePath(), new Date()));
+        String FileNameWithoutExtension=mCurrentFile.getName().substring(0, mCurrentFile.getName().lastIndexOf('.'));
+        recordingViewModel.insertItem(new RecodingItem(FileNameWithoutExtension, mCurrentFile.getAbsolutePath(), new Date()));
         mRecorder = null;
         mCurrentFile = null;
         button.setImageResource(R.drawable.ic_mic_black_24dp);

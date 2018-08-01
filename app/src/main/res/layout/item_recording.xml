@@ -36,19 +36,17 @@
             <TextView
                 android:id="@+id/titleItemTV"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="50dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
                 android:text=""
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                app:layout_constraintBottom_toTopOf="@+id/dateItemTV"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/playItemIV"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
-                tools:text="Recording of yesterday scandal" />
+                app:layout_constraintVertical_chainStyle="spread_inside"
+                tools:text="Recording of yesterday scandal and the stuff that happens after" />
 
             <ImageView
                 android:id="@+id/playItemIV"

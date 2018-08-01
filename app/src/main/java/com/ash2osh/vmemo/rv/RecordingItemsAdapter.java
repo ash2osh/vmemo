@@ -7,6 +7,7 @@ import com.ash2osh.vmemo.data.RecodingItem;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 
+import java.text.DateFormat;
 import java.util.List;
 
 public class RecordingItemsAdapter extends BaseQuickAdapter<RecodingItem,BaseViewHolder> {
@@ -18,6 +19,7 @@ public class RecordingItemsAdapter extends BaseQuickAdapter<RecodingItem,BaseVie
     @Override
     protected void convert(BaseViewHolder holder, RecodingItem item) {
         holder.setText(R.id.titleItemTV,item.getFilename());
-        holder.setText(R.id.dateItemTV,item.getFiledate().toString());//TODO format date
+        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(holder.itemView.getContext());
+        holder.setText(R.id.dateItemTV,dateFormat.format(item.getFiledate()));
     }
 }
